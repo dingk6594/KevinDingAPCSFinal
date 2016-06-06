@@ -1,0 +1,31 @@
+package JavaGame;
+
+import javax.swing.JFrame;
+
+
+public class PaddleBallRunner {
+	
+	int speed = 4;
+	boolean title = true;
+	boolean playing = false;
+	
+public static void main(String[] args) throws InterruptedException {
+		
+		JFrame screen = new JFrame("Paddle Balll");
+		PaddleBall game = new PaddleBall();
+		game.title();
+		screen.add(game);
+		screen.setSize(511, 511);
+		screen.setVisible(true);
+		screen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	
+			while(true)
+			{
+				game.move();
+				game.repaint();
+				int speed = 4000-game.ball.getScore()*65;
+				Thread.sleep(speed/1000,speed%1000);
+				//Thread.sleep(1000);
+			}
+		}
+}

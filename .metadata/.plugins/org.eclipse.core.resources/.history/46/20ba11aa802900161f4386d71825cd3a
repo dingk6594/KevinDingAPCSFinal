@@ -1,0 +1,115 @@
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+
+public class Ball {
+	
+	private int xPos = 255, yPos = 460, xDea = 1, yDea = 1;
+	private PaddleBall game; 
+	private static final int size = 20; 
+	private int score = 0;
+	
+	public Ball(PaddleBall game)
+	{
+		this.game = game; 
+	}
+	
+	public void moveBall()
+	{
+		boolean change = true;
+		//ensures that the ball does not move off screen and bounces off the walls 
+		if(xPos + xDea > game.getWidth() - 20)
+		{
+			xDea = -1; 
+		}
+		else if(xPos + xDea < 0)
+		{
+			xDea = 1; 
+		}
+		else if(yPos + yDea > game.getHeight() - 20)
+		{
+			game.die(); 
+		}
+		else if(yPos + yDea < 0)
+		{
+			yDea = 1;
+		}
+		else if(paddleCollide())
+		{
+			yDea = -1;
+			yPos = game.paddle.getyPos() - 20;
+			//score++; 
+		}
+		//else if(powerUpCollide())
+		//{
+			//game.paddle.repaintLarge(null);
+		//}
+		else if(wallCollide()){
+			
+			//System.out.println("wall collision");
+			score++; 
+		}
+		else if(score == 45)
+		{
+			game.win();
+		}
+		
+		//else
+			//change = false; 
+		
+		//if(change)
+			//Sound.BALL.play();
+		xPos = xPos + xDea;
+		yPos = yPos + yDea; 
+	}
+	
+	public void paint(Graphics2D ball)
+	{
+		ball.setColor(Color.BLACK);
+		ball.fillOval(xPos, yPos, size, size);
+	}
+	
+	public boolean paddleCollide()
+	{
+		return game.paddle.getBounds().intersects(getBounds());
+	}
+	public boolean wallCollide()
+	{
+		
+		for (int i = 0; i<game.walls.wall.size();i++){
+			if(game.walls.wall.get(i).getBounds().intersects(getBounds())){
+				game.walls.wall.remove(i);
+				yDea = -yDea;
+				return true;
+				
+			}
+		}
+		return false;
+	}
+	
+	/*public boolean powerUpCollide()
+	{
+		for(int i = 0; i < game.power.fun.size(); i++)
+		{
+			if(game.power.fun.get(i).getBounds().intersects(getBounds()))
+			{
+				game.power.fun.remove(i);
+				yDea = -yDea;
+				return true; 
+			}
+		}
+		return false; 
+		
+	}*/
+	
+	public Rectangle getBounds()
+	{
+		return new Rectangle(xPos, yPos, size, size);
+	}
+	
+	public int getScore()
+	{
+		return score; 
+	}
+}

@@ -1,0 +1,320 @@
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Canvas;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+
+import static java.lang.Character.*;
+
+import java.awt.image.BufferedImage;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+public class OuterSpace extends Canvas implements KeyListener, Runnable
+{
+	private Ship ship;
+	private Alien alienOne;
+	private Alien alienTwo;
+	private Alien alienThree;
+	private Alien alienFive;
+	private Alien alienFour;
+	private Alien alienSix;
+	private Alien alienSeven;
+	private AlienShots shots;
+	private AlienHorde horde;
+	private Bullets bullets;
+	private int relativeX, relativeY, ammoRechargeRectangleSize = 209;
+	private long timeOrig = System.nanoTime();
+	private boolean canWarp = true, canShoot = true;
+	private Color healthColor;
+
+
+	private boolean[] keys;
+	private BufferedImage back;
+
+	public OuterSpace()
+	{
+		setBackground(Color.black);
+
+		keys = new boolean[5];
+
+		//instantiate other instance variables
+		//Ship, Alien
+		ship = new Ship (400, 300, 50, 50, 7);
+		alienOne = new Alien(100, 30, 50, 50, 1);
+		alienTwo = new Alien(200, 30, 50, 50, 1);
+		alienThree = new Alien(300, 30, 50, 50, 1);
+		alienFour = new Alien(400, 30, 50, 50, 1);
+		alienFive = new Alien(500, 30, 50, 50, 1);
+		horde = new AlienHorde();
+		horde.add(alienOne);
+		horde.add(alienTwo);
+		horde.add(alienThree);
+		horde.add(alienFour);
+		horde.add(alienFive);
+		shots = new AlienShots();
+		bullets = new Bullets();
+
+		this.addKeyListener(this);
+		new Thread(this).start();
+
+		setVisible(true);
+	}
+
+   public void update(Graphics window)
+   {
+		   paint(window);
+   }
+
+	public void paint( Graphics window )
+	{
+		//set up the double buffering to make the game animation nice and smooth
+		Graphics2D twoDGraph = (Graphics2D)window;
+
+		//take a snap shop of the current screen and same it as an image
+		//that is the exact same width and height as the current screen
+		if(back==null)
+		   back = (BufferedImage)(createImage(getWidth(),getHeight()));
+
+		//create a graphics reference to the back ground image
+		//we will draw all changes on the background image
+		Graphics graphToBack = back.createGraphics();
+		
+		graphToBack.setColor(Color.BLACK);
+		graphToBack.fillRect(0,0,1080,720);
+		graphToBack.setColor(Color.WHITE);
+		graphToBack.drawRoundRect(800,25, 212, 25, 10, 10);
+		graphToBack.drawRoundRect(800, 630, 212, 25 , 10, 10);
+		graphToBack.drawRoundRect(1015, 150, 25, 350, 10, 10);
+		graphToBack.drawString("HEALTH: ", 740, 43);
+		graphToBack.drawString("Space -     The Final Frontier", 10, 20);
+		//graphToBack.drawString("POWERUP: ", 740, 648);
+		//graphToBack.drawString("StarFighter ", 500, 50);
+		graphToBack.drawString("WARP", 1010, 135);
+
+
+
+		//Health Stuff
+		graphToBack.setColor(healthColor);
+		graphToBack.fillRoundRect(802, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(823, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(844, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(865, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(886, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(907, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(928, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(949, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(970, 27, 20, 22, 3, 3);
+		graphToBack.fillRoundRect(991, 27, 20, 22, 3, 3);
+
+		//Ammo Recharge
+		graphToBack.setColor(Color.GREEN);
+		//graphToBack.drawRoundRect(800, 630, 212, 25 , 10, 10);
+		graphToBack.fillRoundRect(802, 632, ammoRechargeRectangleSize, 22, 3, 3);
+
+		graphToBack.setColor(Color.YELLOW);
+		//graphToBack.drawString("StarFighter ", 10, 20 );
+		graphToBack.drawString(horde.toString(), 200, 20 );
+		graphToBack.drawString(ship.toString(), 400, 20 );
+		
+		if (horde.points() == horde.getList().size() && horde.getList().size() > 0)
+		{
+			Font myFont = new Font("ROMAN_BASELINE", Font.BOLD, 48);
+			graphToBack.setFont(myFont);
+			graphToBack.setColor(Color.GREEN);
+			graphToBack.drawString("YOU WIN!!! ", 450, 300 );
+		}
+		
+		if (ship.isAlive() == false)
+		{
+			Font myFont = new Font("Serif", Font.BOLD, 48);
+			graphToBack.setFont(myFont);
+			graphToBack.setColor(Color.RED);
+			graphToBack.drawString("GAME OVER", 250, 300 );
+			for (int i = 0; i < horde.getList().size(); i++)
+			{
+				horde.getList().remove(i);
+			}
+		}
+		
+		relativeX = (int)Math.round(Math.cos(Math.toRadians(ship.getAngle())) * ship.getSpeed());
+		relativeY = (int)Math.round(Math.sin(Math.toRadians(ship.getAngle())) * ship.getSpeed());
+		
+		if((System.nanoTime() - timeOrig) % 25 == 0)
+		{
+			canWarp = true;
+		}
+		else
+		{
+			canWarp = false;
+		}
+
+		if((System.nanoTime() - timeOrig) % 25 == 0)
+		{
+			canShoot = true;
+		}
+		else
+		{
+			canShoot = false;
+		}
+		
+		
+		if(keys[0] == true)
+		{
+			ship.turn("RLEFT");
+		}
+		if(keys[1] == true)
+		{
+			ship.move("RRIGHT");
+		}
+		if(keys[2] == true)
+		{
+			ship.setX(ship.getX() + relativeX);
+			ship.setY(ship.getY() - relativeY);
+			
+		}
+		if(keys[3] == true)
+		{
+			ship.setX(ship.getX() - relativeX);
+			ship.setY(ship.getY() + relativeY);				
+		}
+		if(keys[4] == true)
+		{
+			if(canShoot)
+			{
+				bullets.add(new Ammo(ship.getX() + ship.getWidth() / 2 , ship.getY(), 1));
+			}
+		}
+		
+		for (int i = 0; i < horde.getList().size(); i++)
+		{
+			if (horde.getList().get(i).isAlive() && horde.getList().get(i).getX()==100*i)
+			{
+				shots.add(new Ammo(horde.getList().get(i).getX()+ horde.getList().get(i).getWidth() / 2, horde.getList().get(i).getY()+horde.getList().get(i).getHeight(), 1));
+			}
+		}
+		
+
+		//add code to move Ship, Alien, etc.
+
+
+		//add in collision detection to see if Bullets hit the Aliens and if Bullets hit the Ship
+		
+		//for (int i = 0; i < horde.getList().size(); i++)
+		//{
+		//	horde.getList().get(i).update();
+		//}
+		
+		bullets.cleanEmUp(graphToBack);
+		bullets.moveEmAll();
+		bullets.drawEmAll(graphToBack);
+		
+		horde.removeDeadOnes(bullets.getList());
+		
+		horde.moveEmAll();
+		horde.drawEmAll(graphToBack);
+		
+		shots.moveEmAll();
+		shots.drawEmAll(graphToBack); 
+		
+		ship.draw(graphToBack);
+		ship.numlives(shots.getList());
+		twoDGraph.drawImage(back, null, 0, 0);
+		
+		if(ship.getY() > 720)
+		{
+			ship.setY(0); 
+		}
+		else if(ship.getY() < 0)
+		{
+			ship.setY(720);
+		}
+		else if(ship.getX() < 0)
+		{
+			ship.setX(1080);
+		}
+		else if(ship.getX() > 1080)
+		{
+			ship.setX(0);
+		}	
+	}
+	
+	public void keyPressed(KeyEvent e)
+	{
+		if (e.getKeyCode() == KeyEvent.VK_A)
+		{
+			keys[0] = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_D)
+		{
+			keys[1] = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_W)
+		{
+			keys[2] = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_S)
+		{
+			keys[3] = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_SPACE)
+		{
+			keys[4] = true;
+		}
+		repaint();
+	}
+
+	public void keyReleased(KeyEvent e)
+	{
+		if (e.getKeyCode() == KeyEvent.VK_A)
+		{
+			keys[0] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_D)
+		{
+			keys[1] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_W)
+		{
+			keys[2] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_S)
+		{
+			keys[3] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_SPACE)
+		{
+			keys[4] = false;
+		}
+		repaint();
+	}
+ 
+	public void keyTyped(KeyEvent e)
+	{
+      //no code needed here
+	}
+	
+	public Ship getShip()
+	{
+		return ship;
+	}
+
+   public void run()
+   {
+   	try
+   	{
+   		while(true)
+   		{
+   		   Thread.currentThread().sleep(5);
+            repaint();
+         }
+      }catch(Exception e)
+      {
+      }
+  	}
+}
+

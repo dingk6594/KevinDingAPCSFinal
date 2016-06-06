@@ -1,0 +1,134 @@
+package JavaGame;
+
+import java.awt.Color;
+//import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.awt.Graphics2D;
+
+public class BrickWall {
+	public ArrayList <Brick> wall;
+	private PaddleBall game; 
+	//private Ball ball; 
+	//private int brickX = 70, brickY = 50;
+	public BrickWall(PaddleBall game){
+		this.game = game;  
+		wall = new ArrayList<Brick>();
+		
+	for(int i=0; i < 9; i++){
+			Brick thingThatIsBadForYourTeeth = new Brick();
+			thingThatIsBadForYourTeeth.setLocation((i*60), 50);
+			
+			wall.add(thingThatIsBadForYourTeeth);
+		}
+		
+		for(int i = 0; i < 8; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i)*60+30, 70);
+			
+			wall.add(weeee);
+		}
+		
+		for(int i=0; i < 7; i++){
+			Brick thingThatIsBadForYourTeeth = new Brick();
+			thingThatIsBadForYourTeeth.setLocation(((i+1)*60), 90);
+			
+			wall.add(thingThatIsBadForYourTeeth);
+		}
+		
+		for(int i = 0; i < 6; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i+1)*60+30, 110);
+			
+			wall.add(weeee);
+		}
+		
+		for(int i = 0; i < 5; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i+2)*60, 130);
+			
+			wall.add(weeee);
+		}
+		
+		for(int i = 0; i < 4; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i+2)*60+30, 150);
+			
+			wall.add(weeee);
+		}
+		
+
+		for(int i = 0; i < 3; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i+3)*60, 170);
+			
+			wall.add(weeee);
+		}
+		
+		
+		for(int i = 0; i < 2; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i+3)*60+30, 190);
+			
+			wall.add(weeee);
+		}
+		
+		for(int i = 0; i < 1; i++)
+		{
+			Brick weeee = new Brick(); 
+			weeee.setLocation((i+4)*60, 210);
+			
+			wall.add(weeee);
+		}
+		
+		
+		//for(int i = 0; i)
+		
+		/*if(ball.getScore() == wall.size()) 
+		{
+			game.win();
+			
+		}*/
+//		for(int i = 0; i < 3;i++)
+//		{
+//			Brick chadtheloser = new Brick();
+//			chadtheloser.setLocation((i+1)*136, 110);
+//			
+//			wall.add(chadtheloser);
+//		}
+//		
+//		for(int i = 0; i < 2;i++)
+//		{
+//			Brick boob = new Brick();
+//			boob.setLocation((i+1)*220, 130);
+//			
+//			wall.add(boob);
+//		}
+//		
+//		for(int i = 0; i < 1;i++)
+//		{
+//			Brick emily = new Brick();
+//			emily.setLocation(500, 150);
+//			
+//			wall.add(emily);
+//		}
+	}
+	
+	public void paint(Graphics2D window)
+	{
+		Color temp = window.getColor();
+		for (Brick b: wall){
+			window.fill(b);
+			window.setColor(Color.BLACK);
+			window.draw(b);
+			window.setColor(temp);
+			
+		}
+	}
+	
+}

@@ -1,0 +1,19 @@
+package OneonOneBattle;
+
+import java.awt.Image;
+
+public class Player extends Moveable {
+	
+	
+	
+	public Player (final int xPos,final int yPos, final int height, final int width, final Image img){
+		
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.height = height;
+		this.width = width;
+		this.img = img;
+	}
+
+
+	

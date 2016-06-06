@@ -1,0 +1,39 @@
+package OneonOneBattle;
+
+import java.awt.Graphics;
+import java.awt.Image;
+
+public class MoveableThing extends Moveable {
+	
+	private Image img;
+	private int xPos;
+	private int yPos;
+	private int height;
+	private int width;
+	private int health;
+	
+
+	public MoveableThing (final int xPos,final int yPos, final int height, final int width, final Image img){
+		
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.height = height;
+		this.width = width;
+		this.img = img;
+		
+	
+	}
+	
+
+
+	@Override
+	void draw(Graphics g) {
+		g.drawImage(img, xPos, yPos, height, width, null);
+	}
+		// TODO Auto-generated method stub
+		
+
+
+	void update() {
+		// TODO Auto-generated method stub
+		

@@ -1,0 +1,43 @@
+package OneonOneBattle;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JFrame;
+
+public class Shooter extends JFrame {
+	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public Shooter(){
+		setTitle("OneonOneBattle");
+		setResizable(false);
+		setSize(1000,900);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+	}
+	
+	public void paint(Graphics g){
+		g.clearRect(0, 0, getWidth(), getHeight());
+		
+		g.fillRect(0, 0, getWidth(), getHeight());
+		
+		g.setColor(Color.red);
+		g.drawString("Test", 50, 50);
+	}
+	
+	public void paintComponent(Graphics g){
+		
+	}
+	
+
+	
+	public static void main(String[] args) {
+		new Shooter();
+	}
+
+}

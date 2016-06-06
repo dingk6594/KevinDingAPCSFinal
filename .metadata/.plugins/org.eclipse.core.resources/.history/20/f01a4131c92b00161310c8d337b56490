@@ -1,0 +1,64 @@
+package OneonOneBattle;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+
+public class Player extends Moveable {
+	
+	
+	private Image img;
+	private int xPos;
+	private int yPos;
+	private int height;
+	private int width;
+	private int health;
+	
+
+	public Player (final int xPos,final int yPos, final int width, final int height, final int health, final String img){
+		
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.height = height;
+		this.width = width;
+		this.img = getImage(img);
+		this.health = health;
+		
+		
+	}
+
+	public void draw(Graphics g){
+		g.drawImage(img, xPos, yPos, width, height, null);}
+
+	@Override
+	void update(final Shooter shooter, final int id) {
+		if(id == 1){
+			if(shooter.player1Up) {
+				if(!(yPos <26)){
+					yPos--;
+				}
+			
+				}else if(shooter.player1Down){
+					if(!(yPos > shooter.getHeight()- 96))
+					yPos++;
+			}
+	
+			
+		} else if(id == 2){
+			
+		}
+		
+	}
+
+	@Override
+	Image getImage(String img) {
+		
+		return Toolkit.getDefaultToolkit().getImage(img);
+	}
+	
+
+}
+
+
+
+	

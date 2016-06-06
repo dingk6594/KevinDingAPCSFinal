@@ -1,0 +1,54 @@
+package JavaGame;
+
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class Lasers
+{
+	private List<Laser> laser;
+	
+	public Lasers()
+	{
+		laser = new ArrayList<Laser>();
+	}
+
+	public void add(Laser al)
+	{
+		laser.add(al);
+	}
+
+	public void drawEmAll( Graphics window )
+	{
+		for(int i = 0; i< laser.size(); i++)
+			laser.get(i).draw(window);
+	}
+
+	public void moveEmAll()
+	{
+		for(int i = 0; i< laser.size(); i++)
+			laser.get(i).move("LEFT");
+	}
+
+	public void cleanEmUp()
+	{
+		for(int i = 0; i<laser.size(); i++)
+		{
+			if(laser.get(i).getX()<=0 || laser.get(i).getX()>=650)
+			{
+				laser.remove(laser.get(i));
+			}
+        }
+	}
+
+	public List<Laser> getList()
+	{
+		return laser;
+	}
+
+	public String toString()
+	{
+		return "";
+	}
+}

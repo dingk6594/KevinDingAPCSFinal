@@ -1,0 +1,482 @@
+package JavaGame;
+
+import java.io.*;
+import java.util.*;
+
+
+	
+
+	/**
+	 * This class is a driver class for using the Frog and Street classes to simulate
+	 * a game of Frogger
+	 * @author Andrew McDowell
+	 * @version 1.0
+	 */
+	public class Frogger 
+	{
+		/** The number of lanes in the street */
+		public static final int NUM_LANES = 10;
+		
+		/** The number of columns in the street */
+		public static final int NUM_COLUMNS = 10;
+		
+		/** The string used as the starting point for the input */
+		public static final String START = "START";
+		
+		/** The string used as the ending point for the input */
+		public static final String END = "END";
+		
+		private Frog frog;
+		private Vector streets;
+		
+		/** Creates a new Frogger Simulator */
+	    public Frogger() 
+		{
+			// Initialize Frogger simulator
+			init();
+	    }
+		
+		/** Initializes the frog and the streets */
+		protected void init()
+		{
+			// Create the Frog object
+			frog = new Frog();
+			
+			// Create the Vector of streets
+			streets = readInputStreets();
+		}
+		
+		/** Reads the input streets */
+		protected Vector readInputStreets()
+		{
+			String line;
+			Street street;
+			Vector streets = new Vector();
+			BufferedReader input = null;
+			
+			try
+			{
+				// Create the input stream
+				input = new BufferedReader( new InputStreamReader( System.in ) );
+				//input = new BufferedReader( new FileReader( "c:\\frogger.in" ) );
+			
+				// Read the first line
+				line = input.readLine();
+			    
+				// Check to see if it is null or the Start string
+				while( ( line != null ) && ( line.equals( Frogger.START ) ) )
+				{
+					// Create a new street object
+					street = new Street( NUM_COLUMNS, NUM_LANES );
+					
+					// Read in one line of lane data at a time and set that lane of the street
+					for( int laneNum = 1; laneNum < NUM_LANES - 1; laneNum++ )
+					{
+						line = input.readLine();
+						street.fillLane( line, laneNum );
+					}
+				
+					// Add the street to the streets Vector
+					streets.add( street );
+					
+					// Read in the next line
+					line = input.readLine();
+					
+					// Check to see if it the End string
+					if ( !line.equals( Frogger.END ) )
+					{
+						System.out.println( "Invalid Data.  Missing \"END\".  Exiting!" );
+						System.exit( 0 );
+					}
+				
+					// Read in the next line
+					line = input.readLine();
+				}
+			}
+			catch( NumberFormatException nfe )
+			{
+				System.out.println( "Error reading input.  Non-numeric data in the input file." );
+				System.exit( 0 );
+			}
+			catch( NoSuchElementException nsee )
+			{
+				System.out.println( "Error reading input.  Make sure every row has enough data." );
+				System.exit( 0 );
+			}
+			catch( IOException ioe )
+			{
+				System.out.println( "Error reading input.  Frogger exiting." );
+				System.out.println( ioe.getMessage() );
+				System.exit( 0 );
+			}
+			
+			// Return the Vector of streets
+			return streets;
+		}
+		
+		/** Starts the simulator */
+		protected void start()
+		{
+			Street street;
+			Enumeration roads = streets.elements();
+			
+			// Loop through all the different streets that were read in from the input
+			while( roads.hasMoreElements() )
+			{
+				// Get the next street
+				street = (Street)roads.nextElement();
+
+				// Start the simulation for this particular street
+				street.start( frog );
+			}
+		}
+		
+		/** Main method which is run by the java interpreter. */
+		public static void main( String args[] )
+		{
+			// Create the Frogger simulator
+			Frogger froggerSimulator = new Frogger();
+			
+			// Start the simulation
+			froggerSimulator.start();
+		}
+	}
+
+	/**
+	 * This class represents the frog object.  It contains member variables and 
+	 * methods to help simulate a frog moving across a street.
+	 * @author Andrew McDowell
+	 * @version 1.0
+	*/
+	class Frog
+	{
+		/** Lane number that the frog is in */
+		private int laneNumber;
+		
+		/** Column number that the frog is in */
+		private int columnNumber;
+		
+		/** Boolean flag indicating whether or not the frog is alive */
+		private boolean alive;
+		
+		/** Public constructor which intializes the frog to alive, and in lane 0
+		 *	and column 0
+		 */
+		public Frog()
+		{ 
+			alive = true;
+			laneNumber = 0;
+			columnNumber = 0;
+		}
+		
+		/** Returns the column number of where the frog currently is 
+		 *  @return The column number the frog is in
+		 */
+		public int getColumnNumber()
+		{
+			return columnNumber;
+		}
+		
+		/** Returns the lane number of where the frog currently is 
+		 * 	@return The lane number the frog is in
+		 */
+		public int getLaneNumber()
+		{
+			return laneNumber;
+		}
+		
+		/** Returns a boolean indicating whether or not the frog made it across the street
+		 *  @param int Number of Lanes in the street
+		 *  @return <code>true</code> if the frog made it across
+		 */
+		public boolean isAcross( int numLanes )
+		{
+			return laneNumber == ( numLanes - 1 );
+		}
+		
+		/** Returns a boolean indicating if the frog is in a lane with cars
+		 *  @param int Number of Lanes in the street
+		 *  @return <code>true</code> if the frog is in a lane with traffic in it
+		 */
+		public boolean isInStreet( int numLanes )
+		{
+			return ( ( laneNumber > 0 ) && ( laneNumber < ( numLanes - 1 ) ) );
+		}
+		
+		/** Returns a boolean indicating where or not the frog has been hit yet
+		 *  @return <code>true</code if the frog is still alive
+		 */
+		public boolean isStillAlive()
+		{
+			return alive;
+		}
+		
+		/** Increments the lane number, which simulates a move by the frog */
+		public void move()
+		{
+			laneNumber++;
+		}
+		
+		/** Increments the column number and sets the lane number back to zero and 
+		 *  changes the frog back to alive.  This is called after the frog dies, and 
+		 *  before the frog starts the next column.
+		 */
+		public void nextColumn()
+		{
+			columnNumber++;
+			laneNumber = 0;
+			alive = true;
+		}
+
+		/** Sets the frog back to lane 0 and column 0.  Called when the frog first starts
+		 *  across a particular street.
+		 */
+		public void reset()
+		{	
+			laneNumber = 0;
+			columnNumber = 0;
+		}
+		
+		/** Sets the alive flag to false.  Called when the frog gets hit. */
+		public void squish()
+		{
+			alive = false;
+		}
+	}
+
+	/**
+	 * This class represents the street object.  It contains member variables and
+	 * methods to simulate a street with traffic.
+	 * @author Andrew McDowell
+	 * @version 1.0
+	 */
+	class Street
+	{	
+		/** Matrix containg the starting position of all the cars */
+		private int[][] startingMatrix;
+		
+		/** Matrix used for temporary storage while running the simulator */
+		private int[][] simulatorMatrix;
+		
+		/** Number of columns in the street */
+		private int NUM_COLUMNS;
+		
+		/** Number of lanes in the street */
+		private int NUM_LANES;
+		
+		/** Public constructor which sets the dimensions of the street and creates
+		 *  the 2 dimension array used for the street.
+		 *  @param int Number of Columns
+		 *  @param int Number of Lanes
+		 */
+		public Street( int numColumns, int numLanes )
+		{
+			// Create the matrix used to represent the street
+			NUM_COLUMNS = numColumns;
+			NUM_LANES = numLanes;
+			startingMatrix = new int[NUM_COLUMNS][NUM_LANES];
+		}
+			
+		/** Fills one lane of the street with the data that is passed in. 
+		 *  @param String Input data
+		 *  @param int Lane Number
+		 *  @exception NoSuchElementException if there is not enough data in the data string
+		 *  @exception NumberFormatException if there is non-numeric data in the data string
+		 */
+		public void fillLane( String data, int laneNum ) 
+				throws NoSuchElementException, NumberFormatException
+		{
+			// Tokenize the input string
+	        StringTokenizer st = new StringTokenizer( data );
+			
+			// For every token in the line of data
+			for ( int colNum = 0; colNum < NUM_COLUMNS; colNum++ )
+			{
+				// Set this spot in the matrix to the velocity of the car in that spot
+				startingMatrix[colNum][laneNum] = Integer.parseInt( st.nextToken() );
+			}
+		}
+		
+		/** Returns a boolean indicating whether or not the frog is on the same square
+		 *  as a car.
+		 *  @param frog A Frog object
+		 *  @return <code>true</code> if the frog is on the same square as a car.
+		 */
+		protected boolean isRoadKill( Frog frog )
+		{
+			return ( simulatorMatrix[frog.getColumnNumber()][frog.getLaneNumber()] != 0 ); 
+		}	
+		
+		/** Moves all the cars in the street by that particular car's velocity and direction.
+		 * @param Frog object
+		 */
+		protected void move( Frog frog )
+		{
+			int[][] newMatrix = new int[NUM_COLUMNS][NUM_LANES];
+			int direction;
+			int velocity;
+			int newColumn;
+			
+			// Loop through every lane.
+			for( int row = 1; row < NUM_LANES - 1; row++ )
+			{
+				// Set the direction depending on the lane number
+				direction = ( row >= 1 ) && ( row < ( NUM_LANES / 2 ) ) ? -1 : 1;
+				
+				// Loop through every column
+				for ( int col = 0; col < NUM_COLUMNS; col++ )
+				{
+					// Retrieve the velocity
+					velocity = simulatorMatrix[col][row];
+					
+					if ( velocity > 0 )
+					{
+						// Calculate the new position of the car.
+						newColumn = ( ( velocity * direction ) + col + 100 ) % 10;
+						
+						// Set the new position of the car in the matrix
+						newMatrix[newColumn][row] = velocity;
+						
+						// If the car moved over the spot with the frog then mark 
+						// the spot with something besides 0 so that the isRoadKill
+						// method will catch it.
+						if ( ( frog.getLaneNumber() == row ) && 
+							 ( ranOverFrog( frog, direction, col, newColumn ) ) )
+						{
+							newMatrix[frog.getColumnNumber()][frog.getLaneNumber()] = -1;
+						}
+					}
+				}
+			}
+			
+			// Set the simulator matrix to the matrix with the new positions of the cars
+			simulatorMatrix = newMatrix;
+		}
+			
+		/**
+		 * Checks to see if the car moved over the square that the frog was in.
+		 * @param frog Frog object
+		 * @param direction The direction the car was going
+		 * @param col previous column of the car
+		 * @param newCol new column of the car
+		 * @return boolean Returns true if the frog was run over
+		 */
+		protected boolean ranOverFrog( Frog frog, int direction, int col, int newCol )
+		{		
+			boolean ranOver = false;
+			
+			// Get the column number of the frog
+			int frogX = frog.getColumnNumber();
+			
+			// If the direction is to the right
+			if ( direction == 1 )
+			{
+				// If the car didn't wrap around to the other side
+				if ( newCol > col )
+				{
+					// If the frog was between the new column and the old column
+					if ( ( frogX > col ) && ( frogX < newCol ) )
+					{
+						ranOver = true;
+					}
+				}
+				// Else the car wrapped around to the other side
+				else
+				{
+					if ( ( frogX > col ) || ( frogX < newCol ) )
+					{
+						ranOver = true;
+					}
+				}
+			}
+			// If the direction is to the left
+			else
+			{
+				// If the car didn't wrap around to the other side
+				if ( newCol < col )
+				{
+					// If the frog was between the new column and the old column
+					if ( ( frogX < col ) && ( frogX > newCol ) )
+					{
+						ranOver = true;
+					}
+				}
+				// Else the car wrapped around to the other side
+				else
+				{
+					if ( ( frogX < col ) || ( frogX > newCol ) )
+					{
+						ranOver = true;
+					}
+				}
+			}			
+			
+			return ranOver;
+		}
+			
+		/** Resets the the simulator matrix back to the starting positions. */
+		protected void reset()
+		{
+			simulatorMatrix = (int[][])startingMatrix.clone();
+		}
+		
+		/** Starts this streets simulation
+		 *  @param frog A Frog Object
+		 */
+		public void start( Frog frog )
+		{
+			// Reset the frog back to column 0 and lane 0.
+			frog.reset();
+			// Reset the cars back to their starting position
+			this.reset();
+			
+			// Try every column
+			while( frog.getColumnNumber() < NUM_COLUMNS )
+			{
+				// Move the frog
+				frog.move();
+				
+				// While the frog is alive and still in the street
+				while( ( frog.isStillAlive() ) && ( frog.isInStreet( NUM_LANES ) ) )
+				{
+					// Check to see if the frog moved onto a car
+					if ( isRoadKill( frog ) )
+					{
+						// If so, kill the frog and continue to the next column
+						frog.squish();
+						continue;
+					}
+					
+					// Move the cars
+					this.move( frog );
+					
+					// Check to see if the frog got hit by a car
+					if ( isRoadKill( frog ) )
+					{
+						// If so, kill the frog and continue to the next column
+						frog.squish();
+						continue;
+					}
+					
+					// Move the frog
+					frog.move();
+				}
+							
+				// Check to see if the frog made it across
+				if ( frog.isAcross( NUM_LANES ) )
+				{
+					// If so, print the success message and return
+					System.out.println( "LEFTOVER POSSUM" );
+					return;
+				}
+				
+				// Move the frog to the next column
+				frog.nextColumn();
+			}
+			
+			// If it gets this far, then the frog ran out of columns to try
+			System.out.println( "FROGGER" );
+		}
+	}
+
+}

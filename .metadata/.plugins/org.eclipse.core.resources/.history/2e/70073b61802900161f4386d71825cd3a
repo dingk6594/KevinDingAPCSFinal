@@ -1,0 +1,101 @@
+package JavaGame;
+
+import java.net.URL;
+import java.awt.Graphics;
+import java.awt.Image;
+import javax.imageio.ImageIO;
+
+public class Agent extends MovingThing
+{
+	private int speed = 50;
+	private Image image;
+	boolean yellow;
+	boolean red;
+	boolean blue;
+
+	public Agent()
+	{
+		this(10,10,50,50,50);
+	}
+	public Agent(int x, int y, int w, int h, int s)
+	{
+		super(x, y, w, h);
+		speed = s;
+		try
+		{
+			URL url = getClass().getResource("agentboyles.png");
+			image = ImageIO.read(url);
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	
+	public void setSpeed(int s)
+	{
+	   speed = s;
+	}
+	public void setImage(String u)
+	{
+		try
+		{
+			URL url = getClass().getResource(u);
+			image = ImageIO.read(url);
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	public void setYellow(boolean y)
+	{
+	   yellow = y;
+	}
+	public void setRed(boolean r)
+	{
+	   red = r;
+	}
+	public void setBlue(boolean b)
+	{
+	   blue = b;
+	}
+	public boolean getYellow()
+	{
+	   return yellow;
+	}
+	public boolean getRed()
+	{
+	   return red;
+	}
+	public boolean getBlue()
+	{
+	   return blue;
+	}
+	public int getSpeed()
+	{
+	   return speed;
+	}
+
+	public void move(String direction)
+	{
+		if(direction.equals("LEFT"))
+			super.setX(getX()-speed);
+		if(direction.equals("RIGHT"))
+			super.setX(getX()+speed);
+		if(direction.equals("UP"))
+			super.setY(getY()+speed);
+		if(direction.equals("DOWN"))
+			super.setY(getY()-speed);
+	}
+
+	public void draw( Graphics window )
+	{
+		window.drawImage(image,getX(),getY(),getWidth(),getHeight(),null);
+	}
+
+	public String toString()
+	{
+		return super.toString() + " " + getSpeed();
+	}
+}

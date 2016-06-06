@@ -1,0 +1,68 @@
+package JavaGame;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+
+
+public class Paddle {
+	private int xPos = 225, xDea = 0; 
+	private PaddleBall game;
+	private static final int yPos = 460; 
+	private int width = 60, height = 10; 
+	//private boolean title;
+	
+	public Paddle(PaddleBall game)
+	{
+		this.game = game;
+	}
+	
+	public void movePaddle()
+	{
+		if(xPos + xDea > 0 && xPos + xDea < game.getWidth() - 60)
+		{
+			xPos = xPos + xDea;
+		}
+	}
+	
+	public void paint(Graphics2D paddle)
+	{
+		paddle.setColor(Color.MAGENTA);
+		paddle.fillRect(xPos, yPos, width, height);
+	}
+	
+	public void repaintLarge(Graphics2D paddle)
+	{
+		width = 120;
+		height = 10;
+		paddle.setColor(Color.RED);
+		paddle.fillRect(xPos, yPos, width, height);
+	}
+	public void keyReleased(KeyEvent e)
+	{
+		xDea = 0;
+	}
+	
+	public void keyPressed(KeyEvent e)
+	{
+		if(e.getKeyCode() == KeyEvent.VK_RIGHT)
+		{
+			xDea = 1;
+		}
+		if(e.getKeyCode() == KeyEvent.VK_LEFT)
+		{
+			xDea = -1;
+		}
+	}
+	
+	public int getyPos()
+	{
+		return yPos;
+	}
+	
+	public Rectangle getBounds()
+	{
+		return new Rectangle(xPos, yPos, width, height);
+	}
+}

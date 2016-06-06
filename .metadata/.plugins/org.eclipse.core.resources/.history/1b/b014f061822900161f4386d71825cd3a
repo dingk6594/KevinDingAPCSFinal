@@ -1,0 +1,11 @@
+package JavaGame;
+
+import java.awt.Rectangle;
+
+public class Brick extends Rectangle{ 
+	public Brick(){
+		this.setSize(30, 20);
+	}
+	
+	
+}

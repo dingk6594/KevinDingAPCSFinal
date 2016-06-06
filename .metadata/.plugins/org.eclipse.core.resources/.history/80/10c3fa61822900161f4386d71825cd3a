@@ -1,0 +1,55 @@
+package JavaGame;
+
+import java.awt.Graphics;
+import java.awt.Image;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+
+
+public class Picture {
+	private int xPos;
+	private int yPos;
+	private int width;
+	private int height;
+	private Image image;
+	
+	public Picture(String s)
+	{
+		xPos = -25;
+		yPos = 0;
+		width = 810;
+		height = 600;
+		try
+		{
+			URL url = getClass().getResource(s);
+			image = ImageIO.read(url);
+		}
+		catch(Exception e)
+		{
+			//feel free to do something here
+		}
+	}
+	public int getX()
+	{
+		return xPos;
+	}
+
+	public int getY()
+	{
+		return yPos;
+	}
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public int getHeight()
+	{
+		return height;
+	}
+	public void draw( Graphics window )
+	{
+		window.drawImage(image,getX(),getY(),getWidth(),getHeight(),null);
+	}
+}

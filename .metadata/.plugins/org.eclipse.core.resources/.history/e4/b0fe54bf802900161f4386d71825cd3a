@@ -1,0 +1,8 @@
+import java.awt.Rectangle;
+
+public class PowerUp extends Rectangle{ 
+	 public PowerUp(){
+		this.setSize(30, 20);
+	}
+}
+

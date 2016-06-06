@@ -1,0 +1,291 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+import javax.swing.JPanel;
+
+public class Maze extends JPanel implements KeyListener, Runnable {
+	private Agent agent;
+	private Lasers lasersL;
+	private Lasers lasersR;
+
+	private int timer = 0;
+	private String scene = "start";
+	private int[][] grid;
+	private int r = 1;
+	private int c = 1;
+	private int health = 3;
+	private boolean won = false;
+
+	private boolean[] keys;
+	private BufferedImage back;
+
+	public Maze() throws FileNotFoundException {
+		setBackground(Color.black);
+
+		lasersL = new Lasers();
+		lasersR = new Lasers();
+		agent = new Agent(17, 50, 35, 50, 50);
+		grid = new int[12][17];
+
+		Scanner file = new Scanner(new File("src/maze.dat"));
+
+		for (int r = 0; r < 12; r++) {
+			for (int c = 0; c < 17; c++) {
+				grid[r][c] = file.nextInt();
+			}
+		}
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++)
+				System.out.print(grid[i][j] + " ");
+			System.out.println();
+		}
+
+		keys = new boolean[5];
+
+		this.addKeyListener(this);
+		new Thread(this).start();
+
+		setVisible(true);
+	}
+
+	public void update(Graphics window) {
+		paint(window);
+	}
+
+	public void paint(Graphics window) {
+		Graphics2D twoDGraph = (Graphics2D) window;
+
+		if (back == null)
+			back = (BufferedImage) (createImage(getWidth(), getHeight()));
+
+		Graphics graphToBack = back.createGraphics();
+
+		graphToBack.setColor(Color.WHITE);
+		graphToBack.fillRect(0, 0, 800, 600);
+
+		if (scene.equals("start")) {
+			Picture start = new Picture("intro.png");
+			start.draw(graphToBack);
+			if (keys[4] == true) {
+				scene = "play";
+			}
+		}
+
+		else if (scene.equals("play")) {
+
+			for (int i = 0; i < grid.length; i++) {
+				for (int j = 0; j < grid[i].length; j++) {
+					if (grid[i][j] == 1) {
+						graphToBack.setColor(Color.BLACK);
+						graphToBack.fillRect(j * 50 - 40, i * 50, 50, 50);
+					}
+					if (grid[i][j] == 2) {
+						graphToBack.setColor(Color.YELLOW);
+						graphToBack.fillRect(j * 50 - 40, i * 50, 50, 50);
+					}
+					if (grid[i][j] == 3) {
+						graphToBack.setColor(Color.RED);
+						graphToBack.fillRect(j * 50 - 40, i * 50, 50, 50);
+					}
+					if (grid[i][j] == 4) {
+						graphToBack.setColor(Color.YELLOW);
+						graphToBack.fillRect(j * 50 - 25, i * 50 + 25, 20, 5);
+					}
+					if (grid[i][j] == 5) {
+						graphToBack.setColor(Color.RED);
+						graphToBack.fillRect(j * 50 - 25, i * 50 + 25, 20, 5);
+					}
+					if (grid[i][j] == 6) {
+						graphToBack.setColor(Color.BLUE);
+						graphToBack.fillRect(j * 50 - 25, i * 50 + 25, 20, 20);
+					}
+
+				}
+			}
+
+			graphToBack.setColor(Color.BLUE);
+			graphToBack.drawString("Spy ", 25, 40);
+			graphToBack.setColor(Color.RED);
+			graphToBack.drawString("Health: " + health, 100, 40);
+			agent.draw(graphToBack);
+
+			if (health <= 0) {
+				agent.setSpeed(0);
+				agent.setImage("tombstone.png");
+				// graphToBack.setColor(Color.RED);
+				// graphToBack.drawString("YOU LOSE", agent.getX(),
+				// agent.getY()+40);
+			}
+			if (won) {
+				graphToBack.setColor(Color.GREEN);
+				graphToBack.drawString("YOU WIN!!!", 270, 375);
+			}
+
+			if (timer < 2) {
+				lasersL.add(new Laser(1 * 50, 10 * 50 + 20, 4));
+			}
+			if (timer > 100) {
+				lasersR.add(new Laser(13 * 50, 8 * 50 + 20, 4));
+				timer = 0;
+			}
+
+			for (Laser r : lasersR.getList()) {
+				r.draw(graphToBack);
+				r.move("LEFT");
+			}
+			for (Laser l : lasersL.getList()) {
+				l.draw(graphToBack);
+				l.move("RIGHT");
+			}
+			for (int i = 0; i < lasersL.getList().size(); i++) {
+				if (agent.getX() >= lasersL.getList().get(i).getX() - 50
+						&& agent.getX() <= lasersL.getList().get(i).getX()
+						&& agent.getY() >= lasersL.getList().get(i).getY() - 50
+						&& agent.getY() <= lasersL.getList().get(i).getY() + 20
+						&& health != 0) {
+					health--;
+					lasersL.getList().remove(i);
+				}
+			}
+			for (int i = 0; i < lasersR.getList().size(); i++) {
+				if (agent.getX() >= lasersR.getList().get(i).getX() - 50
+						&& agent.getX() <= lasersR.getList().get(i).getX()
+						&& agent.getY() >= lasersR.getList().get(i).getY() - 50
+						&& agent.getY() <= lasersR.getList().get(i).getY() + 20
+						&& health != 0) {
+					health--;
+					lasersR.getList().remove(i);
+				}
+			}
+			lasersR.cleanEmUp();
+			lasersL.cleanEmUp();
+			timer++;
+		}
+
+		twoDGraph.drawImage(back, null, 0, 0);
+
+	}
+
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			if (r == 1 && c == 2 && agent.getBlue()) {
+				agent.move("LEFT");
+				c--;
+				won = true;
+			} else if (grid[r][c - 1] == 0) {
+				agent.move("LEFT");
+				c--;
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			if (grid[r][c + 1] == 0) {
+				agent.move("RIGHT");
+				c++;
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			if (grid[r + 1][c] == 0) {
+				agent.move("UP");
+				r++;
+			}
+			if (grid[r + 1][c] == 4) {
+				agent.move("UP");
+				r++;
+				grid[r][c] = 0;
+				agent.setImage("agentboyles1.png");
+				agent.setYellow(true);
+			}
+			if (grid[r + 1][c] == 5) {
+				agent.move("UP");
+				r++;
+				grid[r][c] = 0;
+				agent.setImage("agentboyles2.png");
+				agent.setRed(true);
+			}
+			if (grid[r + 1][c] == 6) {
+				agent.move("UP");
+				r++;
+				grid[r][c] = 0;
+				agent.setImage("agentboyles3.png");
+				agent.setBlue(true);
+			}
+			if (grid[r + 1][c] == 2 && agent.getYellow()) {
+				agent.move("UP");
+				r++;
+			}
+			if (grid[r + 1][c] == 3 && agent.getRed()) {
+				agent.move("UP");
+				r++;
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			if (grid[r - 1][c] == 0) {
+				agent.move("DOWN");
+				r--;
+			}
+			if (grid[r - 1][c] == 2 && agent.getYellow()) {
+				agent.move("DOWN");
+				r--;
+			}
+			if (grid[r - 1][c] == 3 && agent.getRed()) {
+				agent.move("DOWN");
+				r--;
+			}
+
+		}
+		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			keys[4] = true;
+			if (health == 0) {
+				agent = new Agent(17, 50, 35, 50, 50);
+				health = 3;
+				r = 1;
+				c = 1;
+				grid[2][7] = 4;
+				grid[6][7] = 5;
+				grid[10][15] = 6;
+			}
+		}
+		repaint();
+	}
+
+	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			keys[0] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			keys[1] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			keys[2] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			keys[3] = false;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			keys[4] = false;
+		}
+		repaint();
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// no code needed here
+	}
+
+	public void run() {
+		try {
+			while (true) {
+				Thread.currentThread().sleep(5);
+				repaint();
+			}
+		} catch (Exception e) {
+		}
+	}
+}

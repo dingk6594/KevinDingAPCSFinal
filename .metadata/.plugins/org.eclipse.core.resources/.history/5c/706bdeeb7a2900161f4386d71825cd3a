@@ -1,0 +1,127 @@
+package JavaGame;
+
+
+	
+	import ch.aplu.jgamegrid.*;
+	import java.awt.event.KeyEvent;
+	import java.awt.*;
+
+	public class Frogger extends GameGrid
+	{
+	  public Frogger()
+	  {
+	    super(800, 600, 1, null, "sprites/lane.gif", false);
+	    setSimulationPeriod(80);
+	    Frog frog = new Frog();
+	    addActor(frog, new Location(400, 560), Location.NORTH);
+	    playSound(GGSound.DUMMY);
+	    frog.setCollisionRectangle(new Point(0, 0), 30, 30);
+
+	    Car[] cars = new Car[20];
+	    for (int i = 0; i < 10; i++)
+	    {
+	      cars[i] = new Car("sprites/car" + i + ".gif");
+	      cars[i].setHorzMirror(true);
+	      frog.addCollisionActor(cars[i]);
+	    }
+	    for (int i = 0; i < 10; i++)
+	    {
+	      cars[10 + i] = new Car("sprites/car" + i + ".gif");
+	      frog.addCollisionActor(cars[10 + i]);
+	    }
+
+	    for (int i = 0; i < 5; i++)
+	      addActor(cars[i], new Location(350 * i, 90), Location.WEST);
+	    for (int i = 5; i < 10; i++)
+	      addActor(cars[i], new Location(350 * (i - 5), 350), Location.WEST);
+	    for (int i = 10; i < 15; i++)
+	      addActor(cars[i], new Location(350 * (i - 10), 220), Location.EAST);
+	    for (int i = 15; i < 20; i++)
+	      addActor(cars[i], new Location(350 * (i - 15), 480), Location.EAST);
+
+	    addKeyRepeatListener(frog);
+	    setTitle("Frogger -- Use 4 cursor keys to move the frog");
+	    show();
+	    doRun();
+	  }
+
+	  public static void main(String[] args)
+	  {
+	    new Frogger();
+	  }
+	}
+
+	//---------------class Car.java ---------------------------------------
+
+	class Car extends Actor
+	{
+	  public Car(String imagePath)
+	  {
+	    super(imagePath);
+	  }
+
+	  public void act()
+	  {
+	    move();
+	    if (getLocation().x < -100)
+	      setLocation(new Location(1650, getLocation().y));
+	    if (getLocation().x > 1650)
+	      setLocation(new Location(-100, getLocation().y));
+	  }
+	}
+
+	// ---------------- class Frog.java-----------------------------------
+
+	class Frog extends Actor implements GGKeyRepeatListener
+	{
+	  private boolean isFinished = false;
+
+	  public Frog()
+	  {
+	    super("sprites/frog.gif");
+	  }
+
+	  public void act()
+	  {
+	    if (getLocation().y < 25)
+	    {
+	      if (!isFinished)
+	      {
+	        isFinished = true;
+	        gameGrid.playSound(GGSound.FROG);
+	      }
+	    }
+	    else
+	      isFinished = false;
+	  }
+
+	  public void keyRepeated(int keyCode)
+	  {
+	    switch (keyCode)
+	    {
+	      case KeyEvent.VK_UP:
+	        if (!isFinished)
+	          setLocation(new Location(getLocation().x, getLocation().y - 5));
+	        break;
+	      case KeyEvent.VK_DOWN:
+	        setLocation(new Location(getLocation().x, getLocation().y + 5));
+	        break;
+	      case KeyEvent.VK_LEFT:
+	        setLocation(new Location(getLocation().x - 5, getLocation().y));
+	        break;
+	      case KeyEvent.VK_RIGHT:
+	        setLocation(new Location(getLocation().x + 5, getLocation().y));
+	        break;
+	    }
+	  }
+
+	  public int collide(Actor actor1, Actor actor2)
+	  {
+	    gameGrid.playSound(GGSound.BOING);
+	    setLocation(new Location(400, 560));
+	    setDirection(Location.NORTH);
+	    return 0;
+	  }
+	}
+
+}

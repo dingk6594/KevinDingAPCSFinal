@@ -1,0 +1,83 @@
+//© A+ Computer Science  -  www.apluscompsci.com
+//Name -
+//Date -
+//Class - 
+//Lab  -
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
+public class Ammo extends MovingThing
+{
+	private int speed;
+
+	public Ammo()
+	{
+		this(0,0,0);
+	}
+
+	public Ammo(int x, int y)
+	{
+		super (x, y);
+	}
+
+	public Ammo(int x, int y, int s)
+	{
+		super (x, y);
+		speed = s;
+	}
+
+	public void setSpeed(int s)
+	{
+		speed = s;
+	}
+
+	public int getSpeed()
+	{
+		return speed;
+	}
+
+	public void draw( Graphics window )
+	{
+		window.setColor(Color.YELLOW);
+		window.fillRect(super.getX(), super.getY(), 10, 10);
+		//add code to draw the ammo
+	}
+	
+	public void clear(Graphics window) 
+	{
+		window.clearRect(super.getX(), super.getY(), super.getWidth(), super.getHeight());
+	}
+	
+	
+	public void move( String direction )
+	{
+		//add code to draw the ammo
+		if (direction.equals("UP"))
+		{
+			super.setY(super.getY()-speed);
+		}
+		
+		if (direction.equals("DOWN"))
+		{
+			super.setY(super.getY()+speed);
+		}
+	}
+	
+	public boolean collides(Moveable obj) 
+	{
+		return (super.getX() - obj.getX() < obj.getWidth() && super.getX() - obj.getX() >= 0 || 
+				obj.getX() - super.getX() < super.getWidth() && obj.getX() - super.getX() >= 0) && 
+				(super.getY() - obj.getY() < obj.getHeight() && super.getY() - obj.getY() >= 0 || 
+				obj.getY() - super.getY() < super.getHeight() && obj.getY() - super.getY() >= 0);
+	}
+
+	public String toString()
+	{
+		return super.toString() + " "+getSpeed();
+	}
+}
