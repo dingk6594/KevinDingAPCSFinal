@@ -1,0 +1,5 @@
+One on One Battle By Kevin Ding
+Foreword - Two Player Game, Player One - Yellow, Player Two - Blue
+Object of the Game - Hit the Opponent 10 times
+Player On Keys - W - UP, S - Down, D - Shoot
+Player On Keys - UP Arrow - UP, Down Arrow - Down, Left Arrow - Shoot

@@ -1,0 +1,159 @@
+package OneonOneBattle;
+
+import java.awt.Color; 
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+public class Shooter extends JFrame implements KeyListener {
+	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Player player1;
+	private Player player2;
+	public Image image;
+	private Graphics graphics;
+	public boolean player1Up = false;
+	public boolean player1Down = false;
+	public boolean player2Up = false;
+	public boolean player2Down = false;
+	CopyOnWriteArrayList<MoveableThing> bullets = new CopyOnWriteArrayList<MoveableThing>();
+
+	
+	
+
+	public Shooter(){
+		setTitle("OneonOneBattle");
+		setResizable(false);
+		setSize(600,400);
+		setBackground(Color.BLACK);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+		addKeyListener(this);
+		
+		
+		player1 = new Player(10,150,20,90,10, "Images/player1.png");
+		player2 = new Player(570,150,20,90,10, "Images/player2.png");
+		
+		JFrame frame = new JFrame("Game Menu");
+		frame.setSize(640, 480);
+		JPanel panel = new JPanel();
+		panel.add(new JLabel("One on One Battle By Kevin Ding Foreword - Two Player Game, Player One - Yellow, Player Two - Blue")); 
+		frame.add(panel);
+		frame.setLayout(new GridLayout());
+		frame.pack();
+		frame.setVisible(true);
+	}
+	
+	public void paint(Graphics g){
+		image = createImage(getWidth(), getHeight());
+		graphics = image.getGraphics();
+		
+		g.fillRect(0,0,getWidth(), getHeight());
+		paintComponent(graphics);
+		g.drawImage(image, 0, 0, null);
+		repaint();
+		
+	}
+	
+	public void paintComponent(Graphics g){
+		if(player1.getHealth()>0 && player2.getHealth()>0){
+		for(MoveableThing bullet: bullets){
+			bullet.draw(g);
+			bullet.update(this, 0);
+		
+		}}
+		
+		else if(player1.getHealth()<=0) {
+			g.setColor(Color.YELLOW);
+			g.drawString("Player 2 has won!", 250, 190);
+		}
+		
+		else if(player2.getHealth()<=0) {
+			g.setColor(Color.BLUE);
+			g.drawString("Player 1 has won!", 250, 190);
+		}
+		
+		player1.draw(g);
+		player1.update(this, 1);
+		player2.draw(g);
+		player2.update(this, 2);
+		}
+		
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_UP) {
+			player2Up = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			player2Down = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_W) {
+			player1Up = true;
+		} else if (e.getKeyCode() == KeyEvent.VK_S) {
+			player1Down = true;
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_UP) {
+			player2Up = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			player2Down = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_W) {
+				player1Up = false;
+		} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				player1Down = false;
+		} else if(e.getKeyCode() == KeyEvent.VK_D){
+			MoveableThing player2MoveableThing = new MoveableThing(player2, 1, player1.getxPos() - 4, player1.getyPos() +45, 4, 4, "Images/bullet.gif");
+			bullets.add(player2MoveableThing);
+		} else if(e.getKeyCode() == KeyEvent.VK_LEFT){
+			MoveableThing player2MoveableThing = new MoveableThing(player1, -1, player2.getxPos() - 4, player2.getyPos() +45, 4, 4, "Images/bullet.gif");
+			bullets.add(player2MoveableThing);
+		}
+		}
+		
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+	;
+	}
+	
+
+	
+	public Player getPlayer1() {
+		return player1;
+	}
+
+	public void setPlayer1(Player player1) {
+		this.player1 = player1;
+	}
+
+	public Player getPlayer2() {
+		return player2;
+	}
+
+	public void setPlayer2(Player player2) {
+		this.player2 = player2;
+	}
+
+	public static void main(String[] args) {
+		new Shooter();
+	}
+
+
+
+}

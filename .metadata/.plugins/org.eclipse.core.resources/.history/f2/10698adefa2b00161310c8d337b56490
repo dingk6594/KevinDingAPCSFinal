@@ -1,0 +1,14 @@
+package OneonOneBattle;
+
+public class CustomButton {
+
+	public CustomButton(String string) {
+		// TODO Auto-generated constructor stub
+	}
+
+	public void setAlignmentX(float centerAlignment) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

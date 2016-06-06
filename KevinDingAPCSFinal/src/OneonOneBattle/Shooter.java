@@ -2,13 +2,21 @@ package OneonOneBattle;
 
 import java.awt.Color; 
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.io.*;
+
+
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Shooter extends JFrame implements KeyListener {
 	
@@ -26,6 +34,7 @@ public class Shooter extends JFrame implements KeyListener {
 	public boolean player2Up = false;
 	public boolean player2Down = false;
 	CopyOnWriteArrayList<MoveableThing> bullets = new CopyOnWriteArrayList<MoveableThing>();
+
 	
 	
 
@@ -38,8 +47,29 @@ public class Shooter extends JFrame implements KeyListener {
 		setVisible(true);
 		addKeyListener(this);
 		
+		try
+		{
+			File file = new File("Menu.txt");
+			FileWriter fileWriter = new FileWriter(file);
+			PrintWriter printWriter = new PrintWriter(fileWriter);
+			
+			printWriter.println("One on One Battle By Kevin Ding");
+			printWriter.println("Foreword - Two Player Game, Player One - Yellow, Player Two - Blue"); 
+			printWriter.println("Object of the Game - Hit the Opponent 10 times"); 
+			printWriter.println("Player On Keys - W - UP, S - Down, D - Shoot");
+			printWriter.println("Player On Keys - UP Arrow - UP, Down Arrow - Down, Left Arrow - Shoot");
+			
+			
+			Runtime.getRuntime().exec("notepad Menu.txt");
+			fileWriter.flush();
+			fileWriter.close();
+		}catch (IOException e){
+			e.printStackTrace();
+		}
 		player1 = new Player(10,150,20,90,10, "Images/player1.png");
 		player2 = new Player(570,150,20,90,10, "Images/player2.png");
+		
+		
 	}
 	
 	public void paint(Graphics g){
@@ -50,6 +80,7 @@ public class Shooter extends JFrame implements KeyListener {
 		paintComponent(graphics);
 		g.drawImage(image, 0, 0, null);
 		repaint();
+		
 	}
 	
 	public void paintComponent(Graphics g){

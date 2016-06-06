@@ -1,0 +1,47 @@
+package OneonOneBattle;
+
+import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.ImageIcon;
+import javax.swing.BoxLayout;
+import javax.swing.Box;
+
+
+public class Menu extends JPanel{
+	
+	boolean started = false;
+	
+	public Menu() {
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		
+		add(Box.createVerticalStrut(280));
+		
+		CustomButton button = new CustomButton("START");
+		button.setAlignmentX(CENTER_ALIGNMENT);
+		button.addActivionListener(new AbstractAction() ()
+		add(button);
+		
+		add(Box.createVerticalGlue());
+		
+		
+	}
+	
+	public void start(){
+		started = true;
+	}
+	
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		if (started)
+		g.drawImage(new ImageIcon(Menu.class.getResource("")).getImage(),0,0,640, 480);
+		else
+			setBackground(Color.black);
+	}
+
+	private void add(CustomButton button) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
